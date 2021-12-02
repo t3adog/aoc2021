@@ -22,7 +22,30 @@ fun part1(input: List<String>): Int {
 }
 
 fun part2(input: List<String>): Int {
-   return 0
+    var horizontalPosition = 0
+    var depth = 0
+    var aim = 0
+
+    for (step : String in input) {
+        val stepArr = step.split(" ")
+        val action = stepArr[0]
+        val value = stepArr[1].toInt()
+
+        when(action){
+            "forward" -> {
+                horizontalPosition += value
+                depth += aim * value
+            }
+            "down" -> {
+                aim += value
+            }
+            "up" -> {
+                aim -= value
+            }
+        }
+    }
+
+   return horizontalPosition * depth
 }
 
 fun main() {
