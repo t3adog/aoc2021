@@ -1,4 +1,4 @@
-package day1
+package day01
 
 import readInput
 
@@ -32,7 +32,7 @@ fun part2(input: List<String>): Int {
 }
 
 fun main() {
-    val input = readInput("day1", "Day01")
+    val input = readInput("day01", "Day01")
     println(part1(input))
     println(part2(input))
 }
