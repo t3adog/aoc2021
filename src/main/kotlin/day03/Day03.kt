@@ -2,31 +2,18 @@ package day03
 
 import readInput
 
-fun convertBinaryToDecimal(num: Long): Int {
-    var num = num
-    var decimalNumber = 0
-    var i = 0
-    var remainder: Long
-
-    while (num.toInt() != 0) {
-        remainder = num % 10
-        num /= 10
-        decimalNumber += (remainder * Math.pow(2.0, i.toDouble())).toInt()
-        ++i
-    }
-    return decimalNumber
-}
+// work with strings, not bit math because I don't care
 
 fun part1(input: List<String>): Int {
     var gammaRateStr = ""
     var epsilonRateStr = ""
     val numbers_length = input[0].length
 
-    for (index: Int in 0.rangeTo(numbers_length - 1)) {
+    for (index: Int in 0 until numbers_length) {
         var falseCount = 0
         var trueCount = 0
         for (row: String in input) {
-            val char = row.get(index).toString()
+            val char = row[index].toString()
             if (char == "0") {
                 falseCount++
             } else {
@@ -34,20 +21,66 @@ fun part1(input: List<String>): Int {
             }
         }
         if (falseCount > trueCount) {
-            gammaRateStr = gammaRateStr + "0"
-            epsilonRateStr = epsilonRateStr + "1"
+            gammaRateStr += "0"
+            epsilonRateStr += "1"
         } else {
-            gammaRateStr = gammaRateStr + "1"
-            epsilonRateStr = epsilonRateStr + "0"
+            gammaRateStr += "1"
+            epsilonRateStr += "0"
         }
     }
-    val gammaRate = convertBinaryToDecimal(gammaRateStr.toLong())
-    val epsilonRate = convertBinaryToDecimal(epsilonRateStr.toLong())
+    val gammaRate = gammaRateStr.toInt(2)
+    val epsilonRate = epsilonRateStr.toInt(2)
     return gammaRate * epsilonRate
 }
 
+enum class rating {
+    oxygen,
+    co2
+}
+
 fun part2(input: List<String>): Int {
-    return 0
+
+    fun getCriteria(trueCount: Int, falseCount: Int, rating: rating): String {
+        var bitCriteria = ""
+        when (rating) {
+            day03.rating.oxygen -> {
+                if (falseCount > trueCount) {
+                    bitCriteria = "0"
+                } else {
+                    bitCriteria = "1"
+                }
+            }
+            day03.rating.co2 -> {
+                if (falseCount <= trueCount) {
+                    bitCriteria = "0"
+                } else {
+                    bitCriteria = "1"
+                }
+            }
+        }
+        return bitCriteria
+    }
+
+    fun findRating(input: List<String>, bitPosition: Int, rating: rating): Int {
+        var falseCount = 0
+        var trueCount = 0
+        for (row: String in input) {
+            if (row[bitPosition].digitToInt() == 0) {
+                falseCount++
+            } else {
+                trueCount++
+            }
+        }
+        val bitCriteria = getCriteria(trueCount, falseCount, rating)
+        val filteredInput = input.filter { it[bitPosition].toString().equals(bitCriteria) }
+        if (filteredInput.size == 1) {
+            return filteredInput[0].toInt(2)
+        } else {
+            return findRating(filteredInput, bitPosition.plus(1), rating)
+        }
+    }
+
+    return findRating(input, 0, rating.oxygen) * findRating(input, 0, rating.co2)
 }
 
 fun main() {
