@@ -17,6 +17,6 @@ internal class Day04KtTest {
     fun part2() {
         val input = readInput("day04", "Day04_test")
         val result = part2(input)
-        assertEquals(0, result)
+        assertEquals(1924, result)
     }
 }

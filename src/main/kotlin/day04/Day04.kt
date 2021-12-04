@@ -112,11 +112,31 @@ fun part1(input: List<String>): Int {
 }
 
 fun part2(input: List<String>): Int {
-    return 0
+    val bingoNumbers = input[0].split(",").map { it.toInt() }
+    val boards = generateBingoBoards(input.subList(2, input.size))
+
+    var win = false
+    var winNumber = 0
+    var unchekedNumbersSum = 0
+
+    for (bingoNum in bingoNumbers) {
+        for (board in boards) {
+            if (areYouWinningSun(board)) {
+                continue
+            }
+            markBoard(board, bingoNum)
+            win = areYouWinningSun(board)
+            if (win) {
+                winNumber = bingoNum
+                unchekedNumbersSum = calculateUncheckedNumbersSum(board)
+            }
+        }
+    }
+    return unchekedNumbersSum * winNumber
 }
 
 fun main() {
     val input = readInput("day04", "Day04")
-    println(part1(input)) // 24960 не правильно
-    //println(part2(input))
+    println(part1(input))
+    println(part2(input))
 }
