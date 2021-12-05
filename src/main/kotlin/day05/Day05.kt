@@ -30,9 +30,11 @@ fun generateDiagram(x: Int, y: Int): MutableList<MutableList<Int>> {
 }
 
 fun printDiagram(diagram: List<List<Int>>) {
+    println("-----")
     for (line in diagram) {
         println(line)
     }
+    println("-----")
 }
 
 fun parseCoordinates(input: List<String>): List<Pair<Coordinate, Coordinate>> {
@@ -50,6 +52,33 @@ fun parseCoordinates(input: List<String>): List<Pair<Coordinate, Coordinate>> {
 
 fun isConsiderLine(from: Coordinate, to: Coordinate): Boolean {
     return (from.x == to.x) || (from.y == to.y)
+}
+
+fun drawAnyLine(from: Coordinate, to: Coordinate, diagram: MutableList<MutableList<Int>>) {
+    if (isConsiderLine(from, to)) {
+        drawHorizontalLine(from, to, diagram)
+    } else {
+        var fromX = from.x
+        var fromY = from.y
+        val toX = to.x
+        val toY = to.y
+        val xDelta = from.x - to.x
+        val yDelta = from.y - to.y
+        diagram[fromX][fromY] += 1
+        while (fromX != toX && fromY != toY) {
+            if (xDelta < 0) {
+                fromX += 1
+            } else {
+                fromX -= 1
+            }
+            if (yDelta < 0) {
+                fromY += 1
+            } else {
+                fromY -= 1
+            }
+            diagram[fromX][fromY] += 1
+        }
+    }
 }
 
 fun drawHorizontalLine(from: Coordinate, to: Coordinate, diagram: MutableList<MutableList<Int>>) {
@@ -89,7 +118,7 @@ fun count(diagram: MutableList<MutableList<Int>>): Int {
     return count
 }
 
-fun findMaxCoordinates(coordinates : List<Pair<Coordinate, Coordinate>>): Int {
+fun findMaxCoordinates(coordinates: List<Pair<Coordinate, Coordinate>>): Int {
     var maxValue = 0;
     for (coordinate in coordinates) {
         if (maxValue < coordinate.first.x) {
@@ -113,11 +142,21 @@ fun part1(input: List<String>): Int {
             drawHorizontalLine(from, to, diagram)
         }
     }
+    printDiagram(diagram)
     return count(diagram)
 }
 
 fun part2(input: List<String>): Int {
-    return 0
+    val coordinates = parseCoordinates(input)
+    val max = findMaxCoordinates(coordinates)
+    val diagram = generateDiagram(max, max)
+    for (coordinate in coordinates) {
+        val from = coordinate.first
+        val to = coordinate.second
+        drawAnyLine(from, to, diagram)
+    }
+    printDiagram(diagram)
+    return count(diagram)
 }
 
 fun main() {

@@ -16,8 +16,8 @@ internal class Day05KtTest {
     @Test
     fun part2() {
         val input = readInput("day05", "Day05_test")
-        val result = part1(input)
-        assertEquals(0, result)
+        val result = part2(input)
+        assertEquals(12, result)
     }
 
 }
