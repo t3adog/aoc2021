@@ -1,6 +1,5 @@
 package day07
 
-import readInput
 import readInputToIntList
 
 fun part1(input: List<Int>): Int {
@@ -11,28 +10,44 @@ fun part1(input: List<Int>): Int {
     for (index: Int in minValue..maxValue) {
         var sum = 0
         for (crab in input) {
-            if (index > 0) {
-                if (crab > index) {
-                    sum += (crab - index)
-                }
-                if (crab < index) {
-                    sum += (index - crab)
-                }
-                if (crab == index) {
-                    continue
-                }
-            }
-            if (index == 0) {
-                sum += crab
-            }
+            sum += calculateDistance(crab, index)
         }
         log.put(index, sum)
     }
     return log.values.minOrNull() ?: 0
 }
 
+fun calculateDistance(crabPosition: Int, horizontalPosition: Int): Int {
+    return if (horizontalPosition == 0) {
+        crabPosition
+    } else if (horizontalPosition > crabPosition) {
+        horizontalPosition - crabPosition
+    } else {
+        crabPosition - horizontalPosition
+    }
+}
+
+fun calculateFuelConsumption(distance: Int): Int {
+    var finalSum = 0
+    for (x: Int in 0..distance) {
+        finalSum += x
+    }
+    return finalSum
+}
+
 fun part2(input: List<Int>): Int {
-    return 0
+    val maxValue = input.maxOrNull() ?: 0
+    val minValue = input.minOrNull() ?: 0
+
+    val log = mutableMapOf<Int, Int>()
+    for (index: Int in minValue..maxValue) {
+        var sum = 0
+        for (crab in input) {
+            sum += calculateFuelConsumption(calculateDistance(crab, index))
+        }
+        log.put(index, sum)
+    }
+    return log.values.minOrNull() ?: 0
 }
 
 fun main() {
