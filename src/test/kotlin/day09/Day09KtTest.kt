@@ -15,7 +15,7 @@ internal class Day09KtTest {
 
     @Test
     fun part2() {
-        val input = readMatrix("day09", "Day08_test")
+        val input = readMatrix("day09", "Day09_test")
         assertEquals(1134, part2(input))
     }
 }

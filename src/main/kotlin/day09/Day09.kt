@@ -2,38 +2,74 @@ package day09
 
 import readMatrix
 
-fun isLeast(y: Int, x: Int, matrix: List<List<Int>>): Boolean {
-    var neighbours = mutableListOf<Int>()
-    if (y - 1 > -1) {
-        neighbours.add(matrix[y - 1][x])
-    }
-    if (y + 1 < matrix.size) {
-        neighbours.add(matrix[y + 1][x])
-    }
-    if (x - 1 > -1) {
-        neighbours.add(matrix[y][x - 1])
-    }
-    if (x + 1 < matrix[y].size) {
-        neighbours.add(matrix[y][x + 1])
-    }
-    return matrix[y][x] < (neighbours.minOrNull() ?: 0)
+fun isLeast(point: Pair<Int, Int>, input: List<List<Int>>): Boolean {
+    return input[point.first][point.second] < (findNeighboursPoints(input, point).map { input[it.first][it.second] }
+        .minOrNull() ?: 0)
 }
 
-fun part1(input: List<List<Int>>): Int {
-    val minimalValues = mutableListOf<Int>()
+fun findSingleLowPoints(input: List<List<Int>>): List<Pair<Int, Int>> {
+    val minimalPoints = mutableListOf<Pair<Int, Int>>()
 
     for (y: Int in 0..input.size - 1) {
         for (x: Int in 0..input[y].size - 1) {
-            if (isLeast(y, x, input)) {
-                minimalValues.add(input[y][x])
+            val point = Pair(y, x)
+            if (isLeast(point, input)) {
+                minimalPoints.add(point)
             }
         }
     }
-    return minimalValues.map { it + 1 }.sum()
+    return minimalPoints
+}
+
+fun findNeighboursPoints(input: List<List<Int>>, point: Pair<Int, Int>): List<Pair<Int, Int>> {
+    val y = point.first
+    val x = point.second
+    val neighbours = mutableListOf<Pair<Int, Int>>()
+    if (y - 1 > -1) {
+        neighbours.add(Pair(y - 1, x))
+    }
+    if (y + 1 < input.size) {
+        neighbours.add(Pair(y + 1, x))
+    }
+    if (x - 1 > -1) {
+        neighbours.add(Pair(y, x - 1))
+    }
+    if (x + 1 < input[y].size) {
+        neighbours.add(Pair(y, x + 1))
+    }
+    return neighbours
+}
+
+fun findBasins(input: List<List<Int>>): List<Int> {
+    val minimalPoints = findSingleLowPoints(input)
+    val basins = mutableListOf<Int>()
+    for (point in minimalPoints) {
+        val foundPoints = mutableSetOf<Pair<Int, Int>>()
+        foundPoints.add(point)
+
+        while (true) {
+            val size = foundPoints.size
+            val found = mutableListOf<Pair<Int, Int>>()
+            for (foundPoint in foundPoints) {
+                found.addAll(findNeighboursPoints(input, foundPoint).filter { input[it.first][it.second] != 9 })
+            }
+            foundPoints.addAll(found)
+            if (size == foundPoints.size) {
+                break
+            }
+        }
+        basins.add(foundPoints.size)
+    }
+    return basins
+}
+
+fun part1(input: List<List<Int>>): Int {
+    return findSingleLowPoints(input).map { input[it.first][it.second] }.map { it + 1 }.sum()
 }
 
 fun part2(input: List<List<Int>>): Int {
-    return 0
+    val basins = findBasins(input).sorted()
+    return basins[basins.size - 1] * basins[basins.size - 2] * basins[basins.size - 3]
 }
 
 fun main() {
