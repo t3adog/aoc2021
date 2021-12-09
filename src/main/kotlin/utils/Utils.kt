@@ -14,6 +14,10 @@ fun readInputToIntList(day: String, name: String): List<Int> {
     return readInput(day, name)[0].split(",").map { it.toInt() }
 }
 
+fun readMatrix(day: String, name: String): List<List<Int>> {
+    return readInput(day, name).map { it.toList().map { it.digitToInt() } }.toList()
+}
+
 /**
  * Converts string to md5 hash.
  */
