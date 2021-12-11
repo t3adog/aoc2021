@@ -2,16 +2,6 @@ package day11
 
 import readMutableMatrix
 
-fun printOctopuses(input: MutableList<MutableList<Int>>) {
-    for (line in input) {
-        for (step in line) {
-            print(step)
-        }
-        println(" ")
-    }
-    println(" ")
-}
-
 fun findNeighboursOctopus(input: MutableList<MutableList<Int>>, point: Pair<Int, Int>): MutableList<Pair<Int, Int>> {
     val y = point.first
     val x = point.second
@@ -83,10 +73,8 @@ fun flashOctopus(
 }
 
 fun part1(input: MutableList<MutableList<Int>>): Int {
-    printOctopuses(input)
     var flashCount = 0
     for (step in 0..99) {
-        println("Step ${step + 1}")
         for (y in input.indices) {
             for (x in input[y].indices) {
                 input[y][x] += 1
@@ -96,19 +84,30 @@ fun part1(input: MutableList<MutableList<Int>>): Int {
         while (findOctopusesForFlash(input).filter { it !in flashedOctopuses }.isNotEmpty()) {
             flashOctopus(input, findOctopusesForFlash(input), flashedOctopuses)
         }
-        printOctopuses(input)
         flashCount += flashedOctopuses.size
 
     }
     return flashCount
 }
 
-fun part2(input: List<List<Int>>): Int {
-    return 0
+fun part2(input: MutableList<MutableList<Int>>): Int {
+    var step = 0
+    while (input.flatten().count {it == 0} < input.flatten().count()) {
+        for (y in input.indices) {
+            for (x in input[y].indices) {
+                input[y][x] += 1
+            }
+        }
+        val flashedOctopuses = mutableSetOf<Pair<Int, Int>>()
+        while (findOctopusesForFlash(input).filter { it !in flashedOctopuses }.isNotEmpty()) {
+            flashOctopus(input, findOctopusesForFlash(input), flashedOctopuses)
+        }
+        step++
+    }
+    return step
 }
 
 fun main() {
-    val input = readMutableMatrix("day11", "Day11")
-    println(part1(input))
-    println(part2(input))
+    println(part1(readMutableMatrix("day11", "Day11")))
+    println(part2(readMutableMatrix("day11", "Day11")))
 }

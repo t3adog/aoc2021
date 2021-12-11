@@ -15,6 +15,6 @@ internal class Day11KtTest {
 
     @Test
     fun part2() {
-        assertEquals(0, part2(readMutableMatrix("day11", "Day11_test")))
+        assertEquals(195, part2(readMutableMatrix("day11", "Day11_test")))
     }
 }
