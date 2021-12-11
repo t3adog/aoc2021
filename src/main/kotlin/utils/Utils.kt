@@ -7,6 +7,8 @@ import java.security.MessageDigest
  */
 fun readInput(day: String, name: String) = File("src/main/kotlin/$day/resource", "$name.txt").readLines()
 
+fun readInputToMutableList(day: String, name: String) = File("src/main/kotlin/$day/resource", "$name.txt").readLines().toMutableList()
+
 /**
  * Read lines from file to List<Int>
  */
@@ -16,6 +18,10 @@ fun readInputToIntList(day: String, name: String): List<Int> {
 
 fun readMatrix(day: String, name: String): List<List<Int>> {
     return readInput(day, name).map { it.toList().map { it.digitToInt() } }.toList()
+}
+
+fun readMutableMatrix(day: String, name: String): MutableList<MutableList<Int>> {
+    return readInputToMutableList(day, name).map { it.toMutableList().map { it.digitToInt() }.toMutableList() }.toMutableList()
 }
 
 /**
