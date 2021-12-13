@@ -59,8 +59,7 @@ fun foldByY(input: Set<Pair<Int, Int>>, y: Int): Set<Pair<Int, Int>> {
 }
 
 fun part1(input: List<String>): Int {
-    var points = parsePoints(input)
-
+    val points = parsePoints(input)
     val foldInstruction = parseInstructions(input)[0]
 
     return foldInstruction(foldInstruction, points).size
