@@ -2,174 +2,94 @@ package day13
 
 import readInput
 
-fun printPaper(paper: List<List<String>>) {
-    for (line in paper) {
-        println(line)
-    }
+fun parsePoints(input: List<String>): Set<Pair<Int, Int>> {
+    return input
+        .filter { !it.contains("fold along") }
+        .filter { it.length > 0 }
+        .map { it.split(",").map { it.toInt() }.let { (x, y) -> Pair(x, y) } }.toSet()
 }
 
-fun generateEmptyPaper(maxY: Int, maxX: Int): MutableList<MutableList<String>> {
-    val paper = mutableListOf<MutableList<String>>()
+fun parseInstructions(input: List<String>): List<Pair<String, Int>> {
+    val commands = mutableListOf<Pair<String, Int>>()
 
-    for (y: Int in 0..maxY) {
-        val line = mutableListOf<String>()
-        for (x: Int in 0..maxX) {
-            line.add(".")
+    for (line in input.filter { it.contains("fold along") }) {
+        if (line.contains("x")) {
+            commands.add(Pair("x", line.split("=")[1].toInt()))
+        } else {
+            commands.add(Pair("y", line.split("=")[1].toInt()))
         }
-        paper.add(line)
     }
-    return paper
+    return commands
 }
 
-fun fillPaper(paper: MutableList<MutableList<String>>, points: List<Pair<Int, Int>>) {
-    for (point in points) {
-        paper[point.second][point.first] = "#"
+fun foldInstruction(instruction: Pair<String, Int>, points: Set<Pair<Int, Int>>): Set<Pair<Int, Int>> {
+    when (instruction.first) {
+        "x" -> return foldByX(points, instruction.second)
+        "y" -> return foldByY(points, instruction.second)
     }
+    return points
 }
 
-fun foldByY(paper: MutableList<MutableList<String>>, y: Int): MutableList<MutableList<String>> {
+fun foldByX(input: Set<Pair<Int, Int>>, x: Int): Set<Pair<Int, Int>> {
+    val result = mutableSetOf<Pair<Int, Int>>()
 
-    printPaper(paper)
-    val part1 = mutableListOf<MutableList<String>>()
-    val part2 = mutableListOf<MutableList<String>>()
-
-    for (i in 0..y - 1) {
-        part1.add(paper.get(i))
-    }
-
-    for (i in y + 1..paper.size - 1) {
-        part2.add(paper.get(i))
-    }
-
-    println("Part 1")
-    printPaper(part1)
-    println("Part 2")
-    printPaper(part2)
-
-    // реверсируем вторую часть
-
-    part2.reverse()
-
-    println("Reversed part 2")
-    printPaper(part2)
-
-    for (lineIndex in part2.indices) {
-        for (symbolIndex in part2[lineIndex].indices) {
-            if (part2[lineIndex][symbolIndex] == "#") {
-                part1[lineIndex][symbolIndex] = "#"
-            }
+    for (point in input) {
+        if (point.first > x) {
+            result.add(Pair(2 * x - point.first, point.second))
+        } else {
+            result.add(point)
         }
     }
 
-    println("Final cut:")
-    printPaper(part1)
-    return part1
+    return result
 }
 
-fun foldByX(paper: MutableList<MutableList<String>>, x: Int): MutableList<MutableList<String>> {
-    val part1 = mutableListOf<MutableList<String>>()
-    val part2 = mutableListOf<MutableList<String>>()
+fun foldByY(input: Set<Pair<Int, Int>>, y: Int): Set<Pair<Int, Int>> {
+    val result = mutableSetOf<Pair<Int, Int>>()
 
-    for (yIndex in 0.. paper.size - 1) {
-        val line = mutableListOf<String>()
-        for (xIndex in 0..x-1) {
-            line.add(paper[yIndex][xIndex])
-        }
-        part1.add(line)
-    }
-
-    for (yIndex in 0.. paper.size - 1) {
-        val line = mutableListOf<String>()
-        for (xIndex in x+1..paper[yIndex].size-1) {
-            line.add(paper[yIndex][xIndex])
-        }
-        part2.add(line)
-    }
-
-    println("Part 1")
-    printPaper(part1)
-    println("Part 2")
-    printPaper(part2)
-
-    // реверсируем
-    for (line in part2) {
-        line.reverse()
-    }
-
-    println("Reversed 2")
-    printPaper(part2)
-
-    for (lineIndex in part2.indices) {
-        for (symbolIndex in part2[lineIndex].indices) {
-            if (part2[lineIndex][symbolIndex] == "#") {
-                part1[lineIndex][symbolIndex] = "#"
-            }
+    for (point in input) {
+        if (point.second > y) {
+            result.add(Pair(point.first, 2 * y - point.second))
+        } else {
+            result.add(point)
         }
     }
 
-    return part1
+    return result
 }
 
 fun part1(input: List<String>): Int {
-    val points = input
-        .filter { !it.contains("fold along") }
-        .filter { it.length > 0 }
-        .map { Pair(it.split(",")[0].toInt(), it.split(",")[1].toInt()) }
+    var points = parsePoints(input)
 
-    val maxX = points.map { it.first }.maxOrNull() ?: 0
-    val maxY = points.map { it.second }.maxOrNull() ?: 0
-    println("max y: $maxY, max x: $maxX")
-    val foldInstructions = input.filter { it.contains("fold along") }
-    var paper = generateEmptyPaper(maxY, maxX)
-    fillPaper(paper, points)
-    printPaper(paper)
+    val foldInstruction = parseInstructions(input)[0]
 
-    println("")
-    println("")
-    println("")
-
-    for (foldInstruction in listOf<String>(foldInstructions[0])) {
-        if (foldInstruction.contains("y")) {
-            paper = foldByY(paper, foldInstruction.split("=")[1].toInt())
-        } else {
-            paper = foldByX(paper, foldInstruction.split("=")[1].toInt())
-        }
-    }
-
-    println("FINAL FINAL ")
-    printPaper(paper)
-    return paper.flatten().count {it.equals("#")}
+    return foldInstruction(foldInstruction, points).size
 }
 
-fun part2(input: List<String>): Int {
-    val points = input
-        .filter { !it.contains("fold along") }
-        .filter { it.length > 0 }
-        .map { Pair(it.split(",")[0].toInt(), it.split(",")[1].toInt()) }
+fun part2(input: List<String>) {
+    var points = parsePoints(input)
+
+    val foldInstructions = parseInstructions(input)
+
+    for (foldInstruction in foldInstructions) {
+        points = foldInstruction(foldInstruction, points)
+    }
 
     val maxX = points.map { it.first }.maxOrNull() ?: 0
     val maxY = points.map { it.second }.maxOrNull() ?: 0
-    println("max y: $maxY, max x: $maxX")
-    val foldInstructions = input.filter { it.contains("fold along") }
-    var paper = generateEmptyPaper(maxY, maxX)
-    fillPaper(paper, points)
-    printPaper(paper)
+    printPaper(points, maxX + 1, maxY + 1)
+}
 
-    println("")
-    println("")
-    println("")
+fun printPaper(points: Set<Pair<Int, Int>>, maxX: Int, maxY: Int) {
+    val paper = Array(maxY) { CharArray(maxX) { '.' } }
 
-    for (foldInstruction in foldInstructions) {
-        if (foldInstruction.contains("y")) {
-            paper = foldByY(paper, foldInstruction.split("=")[1].toInt())
-        } else {
-            paper = foldByX(paper, foldInstruction.split("=")[1].toInt())
-        }
+    for (point in points) {
+        paper[point.second][point.first] = '#'
     }
 
-    println("FINAL FINAL ")
-    printPaper(paper)
-    return paper.flatten().count {it.equals("#")}
+    for (line in paper) {
+        println(line.concatToString())
+    }
 }
 
 fun main() {
