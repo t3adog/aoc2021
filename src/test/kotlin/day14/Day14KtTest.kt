@@ -9,7 +9,7 @@ internal class Day14KtTest {
 
     @Test
     fun part1() {
-        assertEquals(1, part1(readInput("Day14", "Day14_test")))
+        assertEquals(1588, part1(readInput("Day14", "Day14_test")))
     }
 
     @Test
