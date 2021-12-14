@@ -3,16 +3,16 @@ package day01
 import readInput
 
 fun part1(input: List<String>): Int {
-        var tempNumber = input[0].toInt();
-        var count = 0;
-        for (itemStr: String in input) {
-            val itemInt = itemStr.toInt()
-            if (itemInt > tempNumber) {
-                count++
-            }
-            tempNumber = itemInt
+    var tempNumber = input[0].toInt();
+    var count = 0;
+    for (itemStr: String in input) {
+        val itemInt = itemStr.toInt()
+        if (itemInt > tempNumber) {
+            count++
         }
-        return count
+        tempNumber = itemInt
+    }
+    return count
 }
 
 fun part2(input: List<String>): Int {
@@ -20,7 +20,7 @@ fun part2(input: List<String>): Int {
     var tempNumber = 0;
     for (i in input.indices) {
         if ((i + 2) < input.size) {
-            val sum = input[i].toInt() + input[i+1].toInt() + input[i+2].toInt()
+            val sum = input[i].toInt() + input[i + 1].toInt() + input[i + 2].toInt()
             if (sum > tempNumber && i != 0) {
                 count++
             }

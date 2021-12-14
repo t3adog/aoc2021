@@ -5,15 +5,14 @@ import readInput
 fun parsePairInsertion(input: List<String>): Map<String, String> {
     var pairInsertion = mutableMapOf<String, String>()
     for (line in input) {
-        println(line)
         var (key, value) = line.split("->")
         pairInsertion.put(key.trim(), value.trim())
     }
     return pairInsertion
 }
 
-fun part1(input: List<String>): Int {
-    var polymerTemplate = input.get(0).toMutableList()
+fun part1(input: List<String>): Int { // this code smell is mine
+    val polymerTemplate = input.get(0).toMutableList()
     val pairInsertion = parsePairInsertion(input.subList(2, input.size))
     println(polymerTemplate)
     println(pairInsertion)
@@ -32,7 +31,6 @@ fun part1(input: List<String>): Int {
         polymerTemplate.clear()
         polymerTemplate.addAll(newPolymerTemplate)
         newPolymerTemplate.clear()
-        println("Step: ${step + 1}, polymer: ${polymerTemplate.joinToString("")}")
     }
 
     val allKeys = polymerTemplate.distinct()
@@ -40,14 +38,45 @@ fun part1(input: List<String>): Int {
     val counts = mutableMapOf<Char, Int>()
 
     for (key in allKeys) {
-        counts.put(key, polymerTemplate.count({it.equals(key)}))
+        counts.put(key, polymerTemplate.count({ it.equals(key) }))
     }
 
     return (counts.values.maxOrNull() ?: 0) - (counts.values.minOrNull() ?: 0)
 }
 
-fun part2(input: List<String>): Int {
-    return 0
+fun part2(input: List<String>): Long { // I stole it..
+    val polymerTemplate = input.get(0)
+    val pairInsertion = parsePairInsertion(input.subList(2, input.size))
+
+    var polymerMap = mutableMapOf<String, Long>()
+    for (polymerIndex in polymerTemplate.indices) {
+        if (polymerIndex + 1 < polymerTemplate.length) {
+            polymerMap.put(polymerTemplate[polymerIndex].toString() + polymerTemplate[polymerIndex + 1].toString(), 1)
+        }
+    }
+
+    for (step in 0..39) {
+        polymerMap = polymerMap.flatMap { (a, c) ->
+            val b = pairInsertion[a]!!
+            listOf("${a[0]}$b" to c, "$b${a[1]}" to c)
+        }
+            .groupingBy { it.first }
+            .fold(0L) { a, e -> a + e.second }
+            .toMutableMap()
+    }
+
+    val counts = polymerMap
+        .flatMap { (p, c) -> listOf(p[0] to c, p[1] to c) }
+        .groupingBy { it.first }
+        .fold(0L) { a, e -> a + e.second }
+        .toMutableMap()
+
+    counts[polymerTemplate.first()] = counts[polymerTemplate.first()]!! + 1
+    counts[polymerTemplate.last()] = counts[polymerTemplate.last()]!! + 1
+    val l = counts.map { it.value / 2 }
+    val min = l.minOrNull()!!
+    val max = l.maxOrNull()!!
+    return max - min
 }
 
 fun main() {
